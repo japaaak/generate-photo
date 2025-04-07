@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>バナー作成</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0"></script>
+    <style>
+      body {
+        font-family: "Antonio", sans-serif;
+        text-align: center;
+      }
+      canvas {
+        border: 1px solid #ddd;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>バナー作成ツール</h1>
+    <label>職種: <input type="text" id="job_type" /></label><br />
+    <label>給料: <input type="text" id="salary" /></label><br />
+    <label>都道府県: <input type="text" id="province" /></label><br />
+    <label>市区町村: <input type="text" id="city" /></label><br />
+    <label>求人URL: <input type="text" id="url" /></label><br />
+    <button onclick="generateBanner()">バナー作成</button>
+    <br />
+    <canvas id="canvas" width="1080" height="1080"></canvas>
+    <br />
+    <button onclick="downloadImage()">ダウンロード</button>
+
+    <script>
+      function generateBanner() {
+        const jobType = document.getElementById("job_type").value;
+        const salary = document.getElementById("salary").value;
+        const province = document.getElementById("province").value;
+        const city = document.getElementById("city").value;
+        const url = document.getElementById("url").value;
+
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // 背景色
+        ctx.fillStyle = "#3696DE";
+        ctx.fillRect(0, 0, 1080, 1080);
+
+        // 職種
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 48px Arial"; // Antonio が使えない場合は Arial にフォールバック
+        ctx.textAlign = "center";
+        ctx.fillText(jobType, 540, 140);
+
+        // 給料
+        ctx.font = "bold 100px Arial";
+        ctx.fillText(`¥${salary}`, 540, 380);
+
+        // 住所
+        ctx.font = "bold 50px Arial";
+        ctx.textAlign = "left";
+        ctx.fillText(province, 560, 660);
+        ctx.fillText(city, 560, 730);
+
+        // QRコードを生成
+        QRCode.toCanvas(
+          url,
+          { width: 180, color: { dark: "#FFF", light: "#3696DE" } },
+          function (error, qrCanvas) {
+            if (error) console.error(error);
+            ctx.drawImage(qrCanvas, 360, 610, 180, 180);
+          }
+        );
+      }
+
+      function downloadImage() {
+        const canvas = document.getElementById("canvas");
+        const link = document.createElement("a");
+        link.download = "banner.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+    </script>
+  </body>
+</html>
